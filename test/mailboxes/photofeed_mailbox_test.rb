@@ -16,12 +16,12 @@ class PhotofeedMailboxTest < ActionMailbox::TestCase
       subject: 'Image Upload unit test',
       body: 'Test',
     )
-    mail.add_file(Rails.root.join("test/mailboxes/meme.jpg").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/meme1.jpg").to_s)
 
     inbound=receive_inbound_email_from_source(mail.to_s)
     #.tap(&:route)
     perform_enqueued_jobs
-    pp Album.all
+    #pp Album.all
     assert inbound
   end
 
@@ -29,7 +29,7 @@ class PhotofeedMailboxTest < ActionMailbox::TestCase
     mail = Mail.new(
       from: 'jf.ortega496@gmail.com',
       to: 'b881ced07b7f02fcb7ad23e12e2b3de4@inbound.postmarkapp.com',
-      subject: 'Image Upload unit test',
+      subject: 'Zip Upload unit test',
       body: 'Test',
     )
     mail.add_file(Rails.root.join("test/mailboxes/meme.zip").to_s)
