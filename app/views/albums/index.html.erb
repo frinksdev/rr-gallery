@@ -1,0 +1,9 @@
+<h1>Albums</h1>
+<hr>
+<%= link_to "Nuevo",new_album_path %>
+<hr>
+<ul>
+    <% @albums.each do |album| %>
+        <li><%= link_to image_tag(album.images.url(:thumb)), album_path(album) %></li>
+    <% end %>
+</ul>

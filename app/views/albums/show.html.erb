@@ -1,0 +1,6 @@
+<h1><%= @album.title %></h1>
+<hr>
+<%= link_to "Volver", albums_path %> |
+<%= link_to "Editar", edit_album_path(@album) %>
+<hr>
+<%= image_tag @album.images.url %>
