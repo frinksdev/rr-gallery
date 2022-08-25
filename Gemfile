@@ -42,7 +42,7 @@ gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
-gem 'delayed'
+gem "delayed"
 
 # Use Sass to process CSS
 # gem "sassc-rails"
@@ -51,15 +51,17 @@ gem 'delayed'
 
 gem "image_processing", "~> 1.2"
 
-gem 'devise'
+gem "devise"
 
 gem "kt-paperclip", "~> 6.4", ">= 6.4.1"
 
-gem 'rubyzip'
+gem "rubyzip"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
+  gem "rubocop"
+  gem "rubocop-rails_config"
 end
 
 group :development do
