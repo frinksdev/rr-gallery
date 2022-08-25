@@ -1,5 +1,5 @@
-require 'rubygems'
-require 'zip'
+require "rubygems"
+require "zip"
 
 class InboundMailJob < ApplicationJob
   queue_as :default
@@ -9,34 +9,28 @@ class InboundMailJob < ApplicationJob
     mail = Mail.new(inbound_email.source)
 
     photo = Album.new(title: mail.subject)
-    
-    mail.attachments.each do |att|
-      if att.content_type.match(/application\/zip\;/)
 
-        tempfile = Tempfile.new('tmp', encoding: 'ascii-8bit')
+    photo.save!
+    mail.attachments.each do |att|
+      if att.content_type.match?(/application\/zip;/)
+
+        tempfile = Tempfile.new("tmp", encoding: "ascii-8bit")
         tempfile.write att.decoded
         tempfile.close
 
         Zip::File.open(tempfile) do |zip_file|
-          zip_file.each do |entry|
-            puts "archivo: #{entry}"
-            entry.extract
-            file=Paperclip.io_adapters.for(StringIO.new(entry.get_input_stream.read))
-            file.original_filename = entry.name
-
-            photo.images = file
+          zip_file.glob("**/**/*.{png,jpg,jpeg,gif}") do |f|
+            file = Paperclip.io_adapters.for(StringIO.new(f.get_input_stream.read))
+            file.original_filename = f.name
+            photo.attachments.create(image: file)
           end
         end
       else
         file = Paperclip.io_adapters.for(StringIO.new(att.decoded))
         file.original_filename = att.filename
 
-        photo.images = file
+        photo.attachments.create(image: file)
       end
     end
-    
-    photo.save!
-    puts photo.title
-    puts photo.images
   end
 end

@@ -1,43 +1,105 @@
 require "test_helper"
 
 class PhotofeedMailboxTest < ActionMailbox::TestCase
-  # test "receive mail" do
-  #   receive_inbound_email_from_mail \
-  #     to: '"someone" <someone@example.com>',
-  #     from: '"else" <else@example.com>',
-  #     subject: "Hello world!",
-  #     body: "Hello?"
-  # end
   include ActiveJob::TestHelper
-  test "Send attachments" do
+  test "Send one attachment" do
     mail = Mail.new(
-      from: 'jf.ortega496@gmail.com',
-      to: 'b881ced07b7f02fcb7ad23e12e2b3de4@inbound.postmarkapp.com',
-      subject: 'Image Upload unit test',
-      body: 'Test',
+      subject: "Image Upload Test"
     )
-    mail.add_file(Rails.root.join("test/mailboxes/meme1.jpg").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe1.png").to_s)
 
-    inbound=receive_inbound_email_from_source(mail.to_s)
-    #.tap(&:route)
-    perform_enqueued_jobs
-    #pp Album.all
-    assert inbound
+    receive_inbound_email_from_source(mail.to_s)
+
+    assert_difference "Album.count" do
+      perform_enqueued_jobs
+    end
+
+    album = Album.last
+
+    assert_equal "Image Upload Test", album.title
+
+    assert_equal 1, album.attachments.count
   end
 
-  test "Send attachments with zip" do
+  test "Send zip attachment" do
     mail = Mail.new(
-      from: 'jf.ortega496@gmail.com',
-      to: 'b881ced07b7f02fcb7ad23e12e2b3de4@inbound.postmarkapp.com',
-      subject: 'Zip Upload unit test',
-      body: 'Test',
+      subject: "Zip Upload Test"
     )
-    mail.add_file(Rails.root.join("test/mailboxes/meme.zip").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe.zip").to_s)
 
-    inbound=receive_inbound_email_from_source(mail.to_s)
-    #.tap(&:route)
-    perform_enqueued_jobs
-    #pp Album.all
-    assert inbound
+    receive_inbound_email_from_source(mail.to_s)
+
+    assert_difference "Album.count" do
+      perform_enqueued_jobs
+    end
+
+    album = Album.last
+
+    assert_equal "Zip Upload Test", album.title
+
+    assert_equal 4, album.attachments.count
+  end
+
+  test "send multiple images" do
+    mail = Mail.new(
+      subject: "Images Upload Test"
+    )
+    mail.add_file(Rails.root.join("test/mailboxes/warframe1.png").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe2.png").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe3.png").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe4.png").to_s)
+
+    receive_inbound_email_from_source(mail.to_s)
+
+    assert_difference "Album.count" do
+      perform_enqueued_jobs
+    end
+
+    album = Album.last
+
+    assert_equal "Images Upload Test", album.title
+
+    assert_equal 4, album.attachments.count
+  end
+
+  test "send multiple zip" do
+    mail = Mail.new(
+      subject: "Multiple Zip Upload Test"
+    )
+    mail.add_file(Rails.root.join("test/mailboxes/warframe.zip").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe_f.zip").to_s)
+    receive_inbound_email_from_source(mail.to_s)
+
+    assert_difference "Album.count" do
+      perform_enqueued_jobs
+    end
+
+    album = Album.last
+
+    assert_equal "Multiple Zip Upload Test", album.title
+
+    assert_equal 8, album.attachments.count
+  end
+
+  test "send multiple files images/zip" do
+    mail = Mail.new(
+      subject: "Multiple Files Upload Test"
+    )
+    mail.add_file(Rails.root.join("test/mailboxes/warframe1.png").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe2.png").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe.zip").to_s)
+    mail.add_file(Rails.root.join("test/mailboxes/warframe_f.zip").to_s)
+
+    receive_inbound_email_from_source(mail.to_s)
+
+    assert_difference "Album.count" do
+      perform_enqueued_jobs
+    end
+
+    album = Album.last
+
+    assert_equal "Multiple Files Upload Test", album.title
+
+    assert_equal 10, album.attachments.count
   end
 end
