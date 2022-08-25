@@ -1,5 +1,4 @@
 class AlbumsController < ApplicationController
-
   before_action :authenticate_user!
 
   def index
@@ -34,12 +33,12 @@ class AlbumsController < ApplicationController
     if @album.update(album_params)
       redirect_to @album
     else
-        render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_entity
     end
   end
 
   private
-  def album_params
-    params.require(:album).permit(:title,:images)
-  end
+    def album_params
+      params.require(:album).permit(:title,:images)
+    end
 end
